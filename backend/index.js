@@ -1,16 +1,17 @@
 // backend/index.js
-import express, { json } from "express";
+import express from "express";
 import cors from "cors";
 import rootRouter from "./routes/index.js";
 import dotenv from "dotenv";
 dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(json());
+app.use(express.json());
 
 app.use("/api/v1", rootRouter);
 
-app.listen(3000, () => {
-  console.log("app running on port 3000");
+app.listen(PORT, () => {
+  console.log(`app running on port ${PORT}`);
 });

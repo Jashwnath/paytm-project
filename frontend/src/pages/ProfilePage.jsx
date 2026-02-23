@@ -13,7 +13,7 @@ export const Profile = () => {
 
   const handlePasswordChange = async () => {
     await axios.put(
-      "http://localhost:3000/api/v1/user/",
+      `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/`,
       {
         password: password,
       },
