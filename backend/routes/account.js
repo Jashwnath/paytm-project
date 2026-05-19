@@ -24,40 +24,23 @@ router.get("/balance", authMiddleware, async (req, res) => {
   });
 });
 
-router.post("/send-otp", authMiddleware, async (req, res) => {
+router.get("/test-email", async (req, res) => {
   try {
-    console.log("SEND OTP ROUTE HIT");
+    console.log("TEST EMAIL ROUTE HIT");
 
-    const user = await User.findById(req.userId);
+    await sendOtpEmail("alwarujashwanth@gmail.com", "1234");
 
-    console.log("USER:", user);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    const otp = crypto.randomInt(1000, 9999).toString();
-
-    console.log("OTP:", otp);
-
-    console.log("EMAIL_USER:", process.env.EMAIL_USER);
-    console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
-
-    await sendOtpEmail(user.username, otp);
-
-    console.log("EMAIL SENT SUCCESSFULLY");
+    console.log("EMAIL SENT");
 
     return res.json({
-      message: "OTP sent successfully",
+      message: "Email sent successfully",
     });
   } catch (err) {
-    console.log("OTP ERROR:");
+    console.log("EMAIL ERROR:");
     console.log(err);
 
     return res.status(500).json({
-      message: "Error sending OTP",
+      message: err.message,
     });
   }
 });
