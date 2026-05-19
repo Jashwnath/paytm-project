@@ -12,6 +12,10 @@ export const Signup = () => {
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  // NEW
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   return (
@@ -19,7 +23,9 @@ export const Signup = () => {
       <div className="flex flex-col justify-center">
         <div className="rounded-lg bg-white w-80 text-center p-2 h-max px-4">
           <Heading label={"Sign up"} />
-          <SubHeading label={"Enter your infromation to create an account"} />
+
+          <SubHeading label={"Enter your information to create an account"} />
+
           <InputBox
             onChange={(e) => {
               setFirstName(e.target.value);
@@ -27,6 +33,7 @@ export const Signup = () => {
             placeholder="John"
             label={"First Name"}
           />
+
           <InputBox
             onChange={(e) => {
               setLastName(e.target.value);
@@ -34,6 +41,7 @@ export const Signup = () => {
             placeholder="Doe"
             label={"Last Name"}
           />
+
           <InputBox
             onChange={(e) => {
               setUsername(e.target.value);
@@ -41,37 +49,66 @@ export const Signup = () => {
             placeholder="johndoe@gmail.com"
             label={"Email"}
           />
+
           <InputBox
             onChange={(e) => {
               setPassword(e.target.value);
             }}
             placeholder="123456"
             label={"Password"}
+            type="password"
           />
+
           <div className="pt-4">
             <Button
               onClick={async () => {
-                const response = await axios.post(
-                  `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`,
-                  {
-                    username,
-                    firstName,
-                    lastName,
-                    password,
-                  },
-                );
-                localStorage.setItem("token", response.data.token);
-                localStorage.setItem(
-                  "user",
-                  JSON.stringify({
-                    name: response.data.firstName,
-                  }),
-                );
-                navigate("/dashboard");
+                try {
+                  setLoading(true);
+
+                  const response = await axios.post(
+                    `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`,
+                    {
+                      username,
+                      firstName,
+                      lastName,
+                      password,
+                    },
+                  );
+
+                  localStorage.setItem("token", response.data.token);
+
+                  localStorage.setItem(
+                    "user",
+                    JSON.stringify({
+                      name: response.data.firstName,
+                    }),
+                  );
+
+                  navigate("/dashboard");
+                } catch (err) {
+                  console.log(err);
+                  alert("Signup failed");
+                } finally {
+                  setLoading(false);
+                }
               }}
-              label={"Sign up"}
+              // UPDATED LABEL
+
+              label={
+                loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Signing up...
+                  </div>
+                ) : (
+                  "Sign up"
+                )
+              }
+              // OPTIONAL
+              disabled={loading}
             />
           </div>
+
           <BottomWarning
             label={"Already have an account?"}
             buttonText={"Sign in"}

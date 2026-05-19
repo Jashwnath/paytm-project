@@ -27,7 +27,9 @@ export const Dashboard = () => {
     <div>
       <Appbar />
       <div className="m-8">
-        <Balance value={balance === null ? "Loading..." : `₹${balance}`} />
+        <Balance
+          value={balance === null ? "Loading..." : `₹${balance.toFixed(2)}`}
+        />
         <Users />
       </div>
     </div>

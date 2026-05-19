@@ -4,7 +4,12 @@ import axios from "axios";
 
 export const Profile = () => {
   const navigate = useNavigate();
-  const [password, setPassword] = useState("");
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  // GET USER NAME
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
     localStorage.clear();
@@ -12,42 +17,69 @@ export const Profile = () => {
   };
 
   const handlePasswordChange = async () => {
-    await axios.put(
-      `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/`,
-      {
-        password: password,
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/user`,
+        {
+          currentPassword,
+          newPassword,
         },
-      },
-    );
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        },
+      );
 
-    alert("Password updated successfully");
-    setPassword("");
+      console.log(response.data);
+
+      alert(response.data.message);
+
+      setCurrentPassword("");
+      setNewPassword("");
+    } catch (err) {
+      console.log(err);
+
+      alert(err.response?.data?.message || "Password update failed");
+    }
   };
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-slate-100">
       <div className="bg-white p-8 rounded-xl shadow-lg w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">
+        <h2 className="text-2xl font-bold mb-2 text-center">
           Account Settings
         </h2>
 
+        {/* USER NAME */}
+        <p className="text-center text-gray-600 mb-6">
+          Logged in as <span className="font-semibold">{user?.name}</span>
+        </p>
+
         <div className="mb-6">
-          <label className="block mb-2 font-medium">Change Password</label>
+          <label className="block mb-2 font-medium">Current Password</label>
+
           <input
             type="password"
-            placeholder="New password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter current password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            className="w-full border px-3 py-2 rounded-lg"
+          />
+
+          <label className="block mt-4 mb-2 font-medium">New Password</label>
+
+          <input
+            type="password"
+            placeholder="Enter new password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
             className="w-full border px-3 py-2 rounded-lg"
           />
 
           <button
             onClick={handlePasswordChange}
-            className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+            className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
           >
             Update Password
           </button>

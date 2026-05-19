@@ -9,15 +9,21 @@ import axios from "axios";
 
 export const Signin = () => {
   const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  // NEW
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="bg-slate-300 h-screen flex justify-center">
       <div className="flex flex-col justify-center">
         <div className="rounded-lg bg-white w-80 text-center p-2 h-max px-4">
           <Heading label={"Sign in"} />
+
           <SubHeading label={"Enter your credentials to access your account"} />
+
           <InputBox
             value={username}
             onChange={(e) => {
@@ -26,6 +32,7 @@ export const Signin = () => {
             placeholder="johndoe@gmail.com"
             label={"Email"}
           />
+
           <InputBox
             value={password}
             onChange={(e) => {
@@ -33,29 +40,56 @@ export const Signin = () => {
             }}
             placeholder="123456"
             label={"Password"}
+            type="password"
           />
+
           <div className="pt-4">
             <Button
               onClick={async () => {
-                const res = await axios.post(
-                  `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signin`,
-                  { username, password },
-                );
+                try {
+                  setLoading(true);
 
-                localStorage.setItem("token", res.data.token);
-                localStorage.setItem(
-                  "user",
-                  JSON.stringify({
-                    name: res.data.firstName,
-                  }),
-                );
-                console.log(res.data);
+                  const res = await axios.post(
+                    `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signin`,
+                    { username, password },
+                  );
 
-                navigate("/dashboard");
+                  localStorage.setItem("token", res.data.token);
+
+                  localStorage.setItem(
+                    "user",
+                    JSON.stringify({
+                      name: res.data.firstName,
+                    }),
+                  );
+
+                  console.log(res.data);
+
+                  navigate("/dashboard");
+                } catch (err) {
+                  console.log(err);
+                  alert("Signin failed");
+                } finally {
+                  setLoading(false);
+                }
               }}
-              label={"Sign in"}
+              // CHANGED
+
+              label={
+                loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Signing in...
+                  </div>
+                ) : (
+                  "Sign in"
+                )
+              }
+              // OPTIONAL
+              disabled={loading}
             />
           </div>
+
           <BottomWarning
             label={"Don't have an account?"}
             buttonText={"Sign up"}
