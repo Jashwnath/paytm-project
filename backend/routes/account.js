@@ -6,6 +6,14 @@ import { default as mongoose } from "mongoose";
 
 const router = Router();
 
+router.get("/hello", (req, res) => {
+  console.log("HELLO ROUTE HIT");
+
+  res.json({
+    message: "hello working",
+  });
+});
+
 router.get("/balance", authMiddleware, async (req, res) => {
   const account = await Account.findOne({
     userId: req.userId,
