@@ -2,17 +2,10 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware.js";
 import { Account } from "../db.js";
+import { sendOtpEmail } from "../sendOtp.js";
 import { default as mongoose } from "mongoose";
 
 const router = Router();
-
-router.get("/hello", (req, res) => {
-  console.log("HELLO ROUTE HIT");
-
-  res.json({
-    message: "hello working",
-  });
-});
 
 router.get("/balance", authMiddleware, async (req, res) => {
   const account = await Account.findOne({
@@ -24,23 +17,43 @@ router.get("/balance", authMiddleware, async (req, res) => {
   });
 });
 
-router.get("/test-email", async (req, res) => {
+router.post("/send-otp", authMiddleware, async (req, res) => {
   try {
-    console.log("TEST EMAIL ROUTE HIT");
+    // FIND CURRENT USER
+    const user = await User.findById(req.userId);
 
-    await sendOtpEmail("alwarujashwanth@gmail.com", "1234");
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
 
-    console.log("EMAIL SENT");
+    // GENERATE 4 DIGIT OTP
+    const otp = crypto.randomInt(1000, 9999).toString();
+
+    // DELETE OLD OTP
+    await OTP.deleteMany({
+      userId: req.userId,
+    });
+
+    // SAVE NEW OTP
+    await OTP.create({
+      userId: req.userId,
+      otp,
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+    });
+
+    // SEND EMAIL
+    await sendOtpEmail(user.username, otp);
 
     return res.json({
-      message: "Email sent successfully",
+      message: "OTP sent successfully",
     });
   } catch (err) {
-    console.log("EMAIL ERROR:");
     console.log(err);
 
     return res.status(500).json({
-      message: err.message,
+      message: "Error sending OTP",
     });
   }
 });
