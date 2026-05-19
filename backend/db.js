@@ -52,7 +52,19 @@ const accountSchema = new Schema({
   },
 });
 
+const otpSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+
+  otp: String,
+
+  expiresAt: Date,
+});
+
 const Account = model("Account", accountSchema);
 const User = model("User", userSchema);
+export const OTP = mongoose.model("OTP", otpSchema);
 
 export { User, Account };
