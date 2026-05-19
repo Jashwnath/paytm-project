@@ -1,6 +1,6 @@
 // backend/routes/account.js
-import { Router } from "express";
 
+import { Router } from "express";
 import crypto from "crypto";
 
 import { authMiddleware } from "../middleware.js";
@@ -11,6 +11,10 @@ import { sendOtpEmail } from "../sendOtp.js";
 
 const router = Router();
 
+/* =========================
+   GET BALANCE
+========================= */
+
 router.get("/balance", authMiddleware, async (req, res) => {
   const account = await Account.findOne({
     userId: req.userId,
@@ -20,6 +24,10 @@ router.get("/balance", authMiddleware, async (req, res) => {
     balance: account.balance,
   });
 });
+
+/* =========================
+   SEND OTP
+========================= */
 
 router.post("/send-otp", authMiddleware, async (req, res) => {
   try {
@@ -48,11 +56,7 @@ router.post("/send-otp", authMiddleware, async (req, res) => {
     });
 
     // SEND EMAIL
-    console.log("BEFORE EMAIL");
-
     await sendOtpEmail(user.username, otp);
-
-    console.log("AFTER EMAIL");
 
     return res.json({
       message: "OTP sent successfully",
@@ -65,6 +69,10 @@ router.post("/send-otp", authMiddleware, async (req, res) => {
     });
   }
 });
+
+/* =========================
+   TRANSFER MONEY
+========================= */
 
 router.post("/transfer", authMiddleware, async (req, res) => {
   try {
@@ -83,14 +91,13 @@ router.post("/transfer", authMiddleware, async (req, res) => {
       otp,
     });
 
-    // INVALID OTP
     if (!otpRecord) {
       return res.status(401).json({
         message: "Invalid OTP",
       });
     }
 
-    // OTP EXPIRED
+    // CHECK OTP EXPIRY
     if (otpRecord.expiresAt < new Date()) {
       await OTP.deleteOne({
         _id: otpRecord._id,
