@@ -18,8 +18,11 @@ router.get("/balance", authMiddleware, async (req, res) => {
 
 router.post("/send-otp", authMiddleware, async (req, res) => {
   try {
-    // FIND CURRENT USER
+    console.log("SEND OTP ROUTE HIT");
+
     const user = await User.findById(req.userId);
+
+    console.log("USER:", user);
 
     if (!user) {
       return res.status(404).json({
@@ -27,28 +30,22 @@ router.post("/send-otp", authMiddleware, async (req, res) => {
       });
     }
 
-    // GENERATE 4 DIGIT OTP
     const otp = crypto.randomInt(1000, 9999).toString();
 
-    // DELETE OLD OTP
-    await OTP.deleteMany({
-      userId: req.userId,
-    });
+    console.log("OTP:", otp);
 
-    // SAVE NEW OTP
-    await OTP.create({
-      userId: req.userId,
-      otp,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-    });
+    console.log("EMAIL_USER:", process.env.EMAIL_USER);
+    console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
 
-    // SEND EMAIL
     await sendOtpEmail(user.username, otp);
+
+    console.log("EMAIL SENT SUCCESSFULLY");
 
     return res.json({
       message: "OTP sent successfully",
     });
   } catch (err) {
+    console.log("OTP ERROR:");
     console.log(err);
 
     return res.status(500).json({
