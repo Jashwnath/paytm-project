@@ -12,23 +12,26 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendOtpEmail = async (to, otp) => {
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
 
-    to,
+      to,
 
-    subject: "Payment OTP Verification",
+      subject: "OTP Verification",
 
-    html: `
-      <div style="font-family: Arial">
-        <h2>OTP Verification</h2>
-
-        <p>Your OTP is:</p>
-
+      html: `
+        <h2>Your OTP</h2>
         <h1>${otp}</h1>
+        <p>Valid for 5 minutes</p>
+      `,
+    });
 
-        <p>Valid for 5 minutes.</p>
-      </div>
-    `,
-  });
+    console.log("EMAIL SENT SUCCESSFULLY");
+  } catch (err) {
+    console.log("NODEMAILER ERROR:");
+    console.log(err);
+
+    throw err;
+  }
 };
