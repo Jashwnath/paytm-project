@@ -3,8 +3,6 @@ import { Router } from "express";
 
 import crypto from "crypto";
 
-import mongoose from "mongoose";
-
 import { authMiddleware } from "../middleware.js";
 
 import { Account, User, OTP } from "../db.js";
