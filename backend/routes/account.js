@@ -48,7 +48,11 @@ router.post("/send-otp", authMiddleware, async (req, res) => {
     });
 
     // SEND EMAIL
+    console.log("BEFORE EMAIL");
+
     await sendOtpEmail(user.username, otp);
+
+    console.log("AFTER EMAIL");
 
     return res.json({
       message: "OTP sent successfully",

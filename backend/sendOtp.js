@@ -1,7 +1,10 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -11,12 +14,21 @@ const transporter = nodemailer.createTransport({
 export const sendOtpEmail = async (to, otp) => {
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
+
     to,
-    subject: "PayTM OTP Verification",
+
+    subject: "Payment OTP Verification",
+
     html: `
-      <h2>Your OTP Code</h2>
-      <h1>${otp}</h1>
-      <p>This OTP is valid for 5 minutes.</p>
+      <div style="font-family: Arial">
+        <h2>OTP Verification</h2>
+
+        <p>Your OTP is:</p>
+
+        <h1>${otp}</h1>
+
+        <p>Valid for 5 minutes.</p>
+      </div>
     `,
   });
 };
