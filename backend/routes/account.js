@@ -1,9 +1,15 @@
 // backend/routes/account.js
 import { Router } from "express";
+
+import crypto from "crypto";
+
+import mongoose from "mongoose";
+
 import { authMiddleware } from "../middleware.js";
-import { Account } from "../db.js";
+
+import { Account, User, OTP } from "../db.js";
+
 import { sendOtpEmail } from "../sendOtp.js";
-import { default as mongoose } from "mongoose";
 
 const router = Router();
 
